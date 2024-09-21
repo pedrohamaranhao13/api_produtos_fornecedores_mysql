@@ -1,5 +1,6 @@
 package br.com.smarttecnologia.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.smarttecnologia.dtos.ProdutoGetDto;
 import br.com.smarttecnologia.dtos.ProdutoPostDto;
 import br.com.smarttecnologia.dtos.ProdutoPutDto;
 import br.com.smarttecnologia.entities.Fornecedor;
@@ -124,12 +126,31 @@ public class ProdutosController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<Produto>> getAll() {
+	public ResponseEntity<List<ProdutoGetDto>> getAll() {
 		try {
 			
 			List<Produto> produtos = produtoRepository.findAll();
+			List<ProdutoGetDto> lista = new ArrayList<ProdutoGetDto>();
 			
-			return ResponseEntity.status(200).body(produtos);
+			for(Produto produto : produtos) {
+				
+				ProdutoGetDto dto = new ProdutoGetDto();
+				dto.setIdProduto(produto.getIdProduto());
+				dto.setNomeProduto(produto.getNome());
+				dto.setPreco(produto.getPreco());
+				dto.setQuantidade(produto.getQuantidade());
+				dto.setTotal(produto.getPreco() * produto.getQuantidade());
+				dto.setDescricao(produto.getDescricao());
+				dto.setIdFornecedor(produto.getFornecedor().getIdFornecedor());
+				dto.setNomeFornecedor(produto.getFornecedor().getNome());
+				dto.setCnpjFornecedor(produto.getFornecedor().getCnpj());
+				dto.setTelefoneFornecedor(produto.getFornecedor().getTelefone());
+				
+				lista.add(dto);
+				
+			}
+			
+			return ResponseEntity.status(200).body(lista);
 			
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body(null);
@@ -137,7 +158,7 @@ public class ProdutosController {
 	}
 	
 	@GetMapping("{idProduto}")
-	public ResponseEntity<Produto> getById(@PathVariable("idProduto") Integer idProduto) {
+	public ResponseEntity<ProdutoGetDto> getById(@PathVariable("idProduto") Integer idProduto) {
 		
 		try {
 			
@@ -146,7 +167,21 @@ public class ProdutosController {
 			if (optional.isPresent()) {
 				
 				Produto produto = optional.get();
-				return ResponseEntity.status(200).body(produto);
+				
+				ProdutoGetDto dto = new ProdutoGetDto();
+				dto.setIdProduto(produto.getIdProduto());
+				dto.setNomeProduto(produto.getNome());
+				dto.setPreco(produto.getPreco());
+				dto.setQuantidade(produto.getQuantidade());
+				dto.setTotal(produto.getPreco() * produto.getQuantidade());
+				dto.setDescricao(produto.getDescricao());
+				dto.setIdFornecedor(produto.getFornecedor().getIdFornecedor());
+				dto.setNomeFornecedor(produto.getFornecedor().getNome());
+				dto.setCnpjFornecedor(produto.getFornecedor().getCnpj());
+				dto.setTelefoneFornecedor(produto.getFornecedor().getTelefone());
+				
+				
+				return ResponseEntity.status(200).body(dto);
 				
 			} else {
 				return ResponseEntity.status(204).body(null);
